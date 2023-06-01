@@ -24,12 +24,10 @@ namespace IconsExtractor
         private int StringToNumber(string s)
         {
             int result = 0;
-            try
-            {
-                if (s.Contains("px}")) { result = Convert.ToInt32(s.Substring(0, s.Length - 3)); }
-                else if (s.Contains("px")) { result = Convert.ToInt32(s.Substring(0, s.Length - 2)); }
-                else { result = Convert.ToInt32(s); }
-            }
+            int bad_char = 0;
+            if (s.Contains("px}")) { bad_char = 3; }
+            else if (s.Contains("px")) { bad_char = 2; }
+            try { result = Convert.ToInt32(s.Substring(0, s.Length - bad_char)); }
             catch { }
 
             return result;
@@ -46,16 +44,14 @@ namespace IconsExtractor
                 CheckPathExists = true,
                 DefaultExt = "txt",
                 Filter = "css files (*.css)|*.css",
-                FilterIndex = 2,
                 RestoreDirectory = true,
                 ReadOnlyChecked = true,
                 ShowReadOnly = true
             };
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                textBox_Css.Text = openFileDialog1.FileName;                
-                string css_text = File.ReadAllText(openFileDialog1.FileName);
-                string[] css_text_array = css_text.Split('.');
+                textBox_Css.Text = openFileDialog1.FileName;
+                string[] css_text_array = File.ReadAllText(openFileDialog1.FileName).Split('.');
                 Icons.List = new List<Icons.Icon_Structure>();
                 foreach (string str in css_text_array)
                 {
@@ -64,12 +60,11 @@ namespace IconsExtractor
                     {
                         try
                         {
-                            string background_position = str.Split('{')[1].Split(';')[0].Split(':')[1];
                             Icons.List.Add(new Icons.Icon_Structure
                             {
                                 name = name,
-                                background_position_x = StringToNumber(background_position.Split(' ')[0]),
-                                background_position_y = StringToNumber(background_position.Split(' ')[1]),
+                                background_position_x = StringToNumber(str.Split('{')[1].Split(';')[0].Split(':')[1].Split(' ')[0]),
+                                background_position_y = StringToNumber(str.Split('{')[1].Split(';')[0].Split(':')[1].Split(' ')[1]),
                                 size_x = StringToNumber(str.Split('{')[1].Split(';')[1].Split(':')[1]),
                                 size_y = StringToNumber(str.Split('{')[1].Split(';')[2].Split(':')[1])
                             });
@@ -92,7 +87,6 @@ namespace IconsExtractor
                 CheckPathExists = true,
                 DefaultExt = "png",
                 Filter = "png files|*.png",
-                FilterIndex = 2,
                 RestoreDirectory = true,
                 ReadOnlyChecked = true,
                 ShowReadOnly = true
@@ -118,18 +112,21 @@ namespace IconsExtractor
             }
             ShowHideExtractBtn();
         }
+        private bool AllLoad()
+        {
+            bool result = false;
+            if ((textBox_Css.Text != "") && (textBox_Picture.Text != "") && (textBox_Output_Path.Text != ""))
+            { result = true; }
+
+            return result;
+        }
         private void ShowHideExtractBtn()
         {
-            if ((textBox_Css.Text != "") && (textBox_Picture.Text != "") && (textBox_Output_Path.Text != ""))
-            {
-                button_Extract_Icons.Visible = true;
-            }
-            else { button_Extract_Icons.Visible = false; }
-            
+            button_Extract_Icons.Visible = AllLoad();
         }
         private void ExtractIcons()
         {
-            if ((textBox_Css.Text != "") && (textBox_Picture.Text != "") && (textBox_Output_Path.Text != ""))
+            if (AllLoad())
             {
                 foreach (Icons.Icon_Structure icon in Icons.List)
                 {
