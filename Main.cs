@@ -60,7 +60,7 @@ namespace IconsExtractor
                 foreach (string str in css_text_array)
                 {
                     string name = str.Split('{')[0];
-                    if (name.Contains("itemdb-")) //Icon
+                    if (name.Contains("itemdb-"))
                     {
                         try
                         {
@@ -133,7 +133,7 @@ namespace IconsExtractor
             {
                 foreach (Icons.Icon_Structure icon in Icons.List)
                 {
-                    Bitmap bitmap = new Bitmap(icon.size_x, icon.size_y); //Size
+                    Bitmap bitmap = new Bitmap(icon.size_x, icon.size_y);
                     Graphics graphics = Graphics.FromImage(bitmap);
                     graphics.DrawImage(Icons.Bitmap, icon.background_position_x, icon.background_position_y);
                     if (!Directory.Exists(textBox_Output_Path.Text + @"\")) { Directory.CreateDirectory(textBox_Output_Path.Text + @"\"); }
